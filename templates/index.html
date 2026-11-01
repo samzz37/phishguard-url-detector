@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f7fa">
+  <meta name="description" content="A straightforward educational tool for checking common phishing URL signals.">
+  <title>PhishGuard — URL Check</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="/" aria-label="PhishGuard home">
+        <span class="brand-mark" aria-hidden="true">P</span>
+        <span>PhishGuard<small>URL CHECKER</small></span>
+      </a>
+      <div class="header-note"><span class="status-dot"></span> Demo scanner <span class="separator">·</span> Runs locally</div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="intro">
+      <div class="section-kicker">LINK SAFETY TOOL</div>
+      <h1>Check a link before<br class="desktop-break"> you open it.</h1>
+      <p>Paste a URL to check for a few common phishing warning signs. You’ll see what triggered a flag and why.</p>
+    </section>
+
+    <section class="checker card" aria-labelledby="checker-title">
+      <div class="card-heading">
+        <div>
+          <div class="overline">URL ANALYSIS</div>
+          <h2 id="checker-title">Enter the website address</h2>
+        </div>
+        <div class="small-badge">No account needed</div>
+      </div>
+      <form method="POST" id="scan-form">
+        <label for="url">Website URL</label>
+        <div class="url-input">
+          <span class="input-prefix" aria-hidden="true">https://</span>
+          <input id="url" name="url" type="text" placeholder="example.com/sign-in" value="{{ submitted_url }}" required autocomplete="url" spellcheck="false">
+          <button type="submit" id="scan-button"><span>Check URL</span><span aria-hidden="true">→</span></button>
+        </div>
+        <div class="form-note"><span aria-hidden="true">ⓘ</span> This demo checks the text of the URL only. It does not visit the website.</div>
+      </form>
+      <div class="examples">
+        <span class="examples-label">Try a sample</span>
+        <button type="button" data-url="https://example.com">Ordinary link</button>
+        <button type="button" data-url="http://192.168.1.1/account">IP address</button>
+        <button type="button" data-url="https://example.com/login-verify-account-update">Suspicious keywords</button>
+      </div>
+    </section>
+
+    {% if result %}
+    <section class="result card {% if result.is_suspicious %}result-risk{% else %}result-safe{% endif %}" aria-live="polite">
+      <div class="result-top">
+        <div class="result-symbol" aria-hidden="true">{% if result.is_suspicious %}!{% else %}✓{% endif %}</div>
+        <div class="result-copy">
+          <div class="overline">CHECK COMPLETE</div>
+          <h2>{{ result.label }}</h2>
+          <p class="checked-url">{{ result.normalized_url }}</p>
+        </div>
+        <span class="risk-label">{{ result.risk }} risk</span>
+      </div>
+      <div class="score-section">
+        <div class="score-caption"><span>Heuristic score</span><strong>{{ result.score }}<small> / 100</small></strong></div>
+        <div class="score-bar"><span style="width: {{ result.score }}%"></span></div>
+        <div class="score-ends"><span>Fewer signals</span><span>More signals</span></div>
+      </div>
+      <div class="findings-block">
+        <h3>What we found</h3>
+        <ul class="findings">{% for finding in result.findings %}<li><span class="finding-bullet" aria-hidden="true"></span><span>{{ finding }}</span></li>{% endfor %}</ul>
+      </div>
+      <p class="result-note"><strong>Keep in mind:</strong> This is a small rule-based classroom project, not a full security service. A low score does not prove a link is safe.</p>
+    </section>
+    {% endif %}
+
+    <section class="checks-section">
+      <div class="section-title">
+        <div>
+          <div class="overline">HOW IT WORKS</div>
+          <h2>Three checks, explained.</h2>
+        </div>
+        <p>Each rule runs separately, so the project is easy to test and extend.</p>
+      </div>
+      <div class="checks-grid">
+        <article class="check-card">
+          <div class="check-number">01</div>
+          <h3>IP address</h3>
+          <p>Checks whether the link uses a numeric IPv4 address instead of a domain name.</p>
+          <div class="check-meta">HOST CHECK</div>
+        </article>
+        <article class="check-card">
+          <div class="check-number">02</div>
+          <h3>URL length</h3>
+          <p>Flags addresses longer than 75 characters. Long links are not always malicious, but they can hide their destination.</p>
+          <div class="check-meta">LENGTH &gt; 75</div>
+        </article>
+        <article class="check-card">
+          <div class="check-number">03</div>
+          <h3>Keyword patterns</h3>
+          <p>Looks for configured terms such as “login-verify” and “account-update”.</p>
+          <div class="check-meta">TEXT MATCH</div>
+        </article>
+      </div>
+    </section>
+
+    <section class="design-note">
+      <div class="design-note-icon" aria-hidden="true">↳</div>
+      <div>
+        <div class="overline">PROJECT DESIGN</div>
+        <h2>Small components. Clear responsibilities.</h2>
+        <p>The Flask route handles the request, the facade coordinates analysis, and separate strategy classes apply the checks. This demonstrates the layered architecture, Facade Pattern and Strategy Pattern from the project blueprint.</p>
+      </div>
+      <div class="architecture-flow" aria-label="Architecture flow">
+        <span>Web page</span><b>→</b><span>Flask</span><b>→</b><span>Facade</span><b>→</b><span>Rules</span>
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <a class="footer-brand" href="/">PhishGuard</a>
+      <p>Student project · Flask and Python</p>
+      <span>Use caution with unfamiliar links.</span>
+    </footer>
+  </main>
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
