@@ -51,3 +51,7 @@ This is an educational heuristic demonstration, not a production-grade security 
    - Build command: `pip install -r requirements.txt`
    - Start command: `gunicorn app:app`
 4. Deploy and open the public `onrender.com` URL Render provides.
+=======
+# phishguard-url-detector
+Phishing URL Detection using Flask, Facade Pattern and Strategy Pattern
+
